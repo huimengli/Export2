@@ -75,4 +75,10 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y /R "$(TargetDir)Core.dll" "$(SolutionDir)dict\" || exit /b /1
+xcopy /Y /R "$(TargetDir)Runtime.dll" "$(SolutionDir)dict\" || exit /b /1
+xcopy /Y /R "$(TargetDir)$(TargetFileName)" "$(SolutionDir)dict\" || exit /b /1
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>

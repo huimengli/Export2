@@ -8,10 +8,12 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Export</RootNamespace>
-    <AssemblyName>Export_Editor</AssemblyName>
+    <AssemblyName>EditorEX</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,20 +33,46 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Core">
+    <Reference Include="Core, Version=0.1.0.9, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>Core\bin\Debug\Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Runtime">
+      <HintPath>Runtime\bin\Debug\Runtime.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UnityEditor">
+      <HintPath>lib\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>lib\UnityEngine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attribute\ReadOnlyEditor.cs" />
+    <Compile Include="Attribute\ReadOnlyTextAreaDrawer.cs" />
+    <Compile Include="Editor\InspectorEX.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Script\Export.cs" />
+    <Content Include="Script\Record.cs" />
+    <Compile Include="Script\Record2.cs" />
+    <Compile Include="Script\RecordWindow.cs" />
+    <Compile Include="UnityFBXExporter\ExporterMenu.cs" />
+    <Compile Include="UnityFBXExporter\FBXExporter.cs" />
+    <Compile Include="UnityFBXExporter\FBXUnityMaterialGetter.cs" />
+    <Compile Include="UnityFBXExporter\FBXUnityMeshGetter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

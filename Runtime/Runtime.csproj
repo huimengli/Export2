@@ -54,6 +54,7 @@
     <Compile Include="BehaviourEX\UUIDBehavior.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script\Message.cs" />
+    <Compile Include="Tools\UnityLogger.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

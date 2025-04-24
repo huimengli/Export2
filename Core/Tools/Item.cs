@@ -14,6 +14,10 @@ namespace Export.Tools
     /// </summary>
     public class Item
     {
+        /// <summary>
+        /// 日志打印器
+        /// </summary>
+        public static Logger logger = new Logger();
 
         /// <summary>
         /// 选择的文件夹路径
@@ -239,7 +243,7 @@ namespace Export.Tools
         /// <param name="value"></param>
         private static void Log(string value)
         {
-            Console.WriteLine(value);
+            logger.Log(value);
         }
 
         /// <summary>

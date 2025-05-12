@@ -8,12 +8,13 @@ set "zipfile=Export.zip"
 if exist "%zipfile%" del "%zipfile%"
 
 :: 调用 PowerShell 压缩指定文件
-powershell -Command "Compress-Archive -Path 'Core.dll', 'Runtime.dll', 'EditorEX.dll' -DestinationPath '%zipfile%' -Force"
+powershell -Command "Compress-Archive -Path 'Core.dll', 'Runtime.dll', 'EditorEX.dll', 'Core.pdb', 'Runtime.pdb', 'EditorEX.pdb' -DestinationPath '%zipfile%' -Force"
 
 echo 压缩完成：%zipfile%
 
 del /S /Q *.dll
+del /S /Q *.pdb
 
-echo dll文件已删除
+echo dll文件和pdb文件已删除
 
 pause

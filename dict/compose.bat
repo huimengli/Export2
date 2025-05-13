@@ -1,6 +1,13 @@
 @echo off
 setlocal
 
+:: 检查 %cd% 路径是否包含 dict\ 目录
+echo "%cd%\" | findstr /i "\\dict\\" >nul
+if %errorlevel% neq 0 (
+    echo 当前路径中未找到 dict\ 目录
+    exit /b 1
+)
+
 :: 定义目标 ZIP 文件名
 set "zipfile=Export.zip"
 

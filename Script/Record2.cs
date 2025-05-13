@@ -27,7 +27,7 @@ namespace Export
         public string INIPATH {
             get
             {
-                var dllPath = Item.GetDllPath("Export");
+                var dllPath = Item.GetDllPath("EditorEX");
                 var fileInfo = new FileInfo(dllPath);
                 return fileInfo.DirectoryName + "\\Export.ini";
             }

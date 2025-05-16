@@ -51,6 +51,7 @@
     <Compile Include="Attribute\ReadOnlyTextAreaAttribute.cs" />
     <Compile Include="BehaviourEX\Dispatcher.cs" />
     <Compile Include="BehaviourEX\NrealBehaviour.cs" />
+    <Compile Include="BehaviourEX\Scheduler.cs" />
     <Compile Include="BehaviourEX\UUIDBehavior.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script\Message.cs" />

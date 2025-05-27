@@ -449,6 +449,44 @@ namespace Export.Tools
             }
             return null;
         }
+
+        /// <summary>
+        /// 或者
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <returns></returns>
+        public static T Or<T>(T t1, T t2) where T : class
+        {
+            if (t1 == null)
+            {
+                return t2;
+            }
+            else
+            {
+                return t1;
+            }
+        }
+
+        /// <summary>
+        /// 或者
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t1"></param>
+        /// <param name="getT2"></param>
+        /// <returns></returns>
+        public static T Or<T>(T t1, Func<T> getT2) where T : class
+        {
+            if(t1 == null)
+            {
+                return getT2();
+            }
+            else
+            {
+                return t1;
+            }
+        }
     }
 
     /// <summary>

@@ -33,6 +33,16 @@ namespace Export.Interface
         float RunSpeed { get; set; } 
 
         /// <summary>
+        /// 玩家位置
+        /// </summary>
+        Vector3 Position { get; set; }
+
+        /// <summary>
+        /// 玩家旋转
+        /// </summary>
+        Quaternion Rotation { get; set; }
+
+        /// <summary>
         /// 玩家移动方法
         /// </summary>
         /// <returns></returns>

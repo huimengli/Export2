@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -62,4 +62,11 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y /R "$(TargetDir)Core.dll" "$(SolutionDir)dict\" || exit /b /1
+xcopy /Y /R "$(TargetDir)Runtime.dll" "$(SolutionDir)dict\" || exit /b /1
+xcopy /Y /R "$(TargetDir)Core.pdb" "$(SolutionDir)dict\" || exit /b /1
+xcopy /Y /R "$(TargetDir)Runtime.pdb" "$(SolutionDir)dict\" || exit /b /1
+explorer /select,"$(SolutionDir)dict\Runtime.dll" || exit /b /1</PostBuildEvent>
+  </PropertyGroup>
 </Project>

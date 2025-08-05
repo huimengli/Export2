@@ -77,6 +77,6 @@
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y /R "$(TargetDir)Core.dll" "$(SolutionDir)dict\" || exit /b /1
 xcopy /Y /R "$(TargetDir)Core.pdb" "$(SolutionDir)dict\" || exit /b /1
-explorer /select,"$(SolutionDir)dict\Core.dll" || exit /b /1</PostBuildEvent>
+::explorer /select,"$(SolutionDir)dict\Core.dll" || exit /b /1</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -95,6 +95,12 @@ namespace Export.Script
             set { runSpeed = value; }
         }
 
+        public float CurrentMoveSpeed
+        {
+            get { return currentMoveSpeed; }
+            set { currentMoveSpeed = value; }
+        }
+
         private void Awake()
         {
             uuid = Item.NewUUID();

@@ -10,7 +10,7 @@ namespace Export.BehaviourEX
     /// <summary>
     /// 通用单一标识符
     /// </summary>
-    public class UUIDBehavior : MonoBehaviour
+    public abstract class UUIDBehavior : MonoBehaviour
     {
         /// <summary>
         /// 全局静态随机数

@@ -33,6 +33,11 @@ namespace Export.Interface
         float RunSpeed { get; set; } 
 
         /// <summary>
+        /// 当前移动速度
+        /// </summary>
+        float CurrentMoveSpeed { get; set; }
+
+        /// <summary>
         /// 玩家位置
         /// </summary>
         Vector3 Position { get; set; }

@@ -1,4 +1,5 @@
 ﻿#define Record
+#define Record2
 
 using System;
 using System.Collections.Generic;
@@ -8,40 +9,26 @@ using UnityEditor;
 using UnityEngine;
 using Export.Tools;
 using System.Threading;
+using Export.SharpDX;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
+
+using Device = SharpDX.Direct3D11.Device;
+using Resource = SharpDX.DXGI.Resource;
+using MapFlags = SharpDX.Direct3D11.MapFlags;
+using ResultCode = SharpDX.DXGI.ResultCode;
+using Object = System.Object;
+using Screen = System.Windows.Forms.Screen;
 
 namespace Export
 {
-    class RecordWindow:EditorWindow
+    class RecordWindow : EditorWindow
     {
         /// <summary>
         /// 录制位置
         /// </summary>
         private static string Path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\output.mkv";
-#if !Record
-        /// <summary>
-        /// 录制模块
-        /// </summary>
-        private static Record record; 
-#endif
-#if !Record2
-        /// <summary>
-        /// 录制模块
-        /// </summary>
-        private static Record2 record2; 
-#endif
-        /// <summary>
-        /// Accord.Video.FFMPEG模块是否加载
-        /// </summary>
-        public static readonly bool FFMPEG = Item.IsAssemblyLoaded("Accord.Video.FFMPEG");
-        /// <summary>
-        /// ffmpeg.exe模块是否加载
-        /// </summary>
-        //[Obsolete]
-        public static readonly bool FFMPEGEXE = true;
-        /// <summary>
-        /// ffmpeg.exe模块位置
-        /// </summary>
-        public static string FFMPEGEXEPATH = "";
+
         /// <summary>
         /// 页面
         /// </summary>
@@ -55,34 +42,6 @@ namespace Export
         static void Record()
         {
             Debug.Log(Path);
-            if (window==null)
-            {
-                window = CreateInstance<RecordWindow>();
-            }
-            window.Show();
-        }
-
-        /// <summary>
-        /// 判断是否能录制
-        /// </summary>
-        /// <returns></returns>
-        [MenuItem("我的工具/录制... %g",true)]
-        [STAThread]
-        static bool CanRecord()
-        {
-            return FFMPEG;
-        }
-        
-        /// <summary>
-        /// 录制
-        /// </summary>
-        [MenuItem("我的工具/录制2... %g")]
-        [STAThread]
-        static void Record2()
-        {
-            Debug.Log(Path);
-            record2 = new Record2(Path);
-            FFMPEGEXEPATH = record2.FFMPEGPATH;
             if (window == null)
             {
                 window = CreateInstance<RecordWindow>();
@@ -94,12 +53,32 @@ namespace Export
         /// 判断是否能录制
         /// </summary>
         /// <returns></returns>
-        [MenuItem("我的工具/录制2... %g",true)]
+        [MenuItem("我的工具/录制... %g", true)]
         [STAThread]
-        static bool CanRecord2()
+        static bool CanRecord()
         {
-            return FFMPEGEXE;
+            return true;
         }
+
+        /// <summary>
+        /// 设备
+        /// </summary>
+        private Device device;
+
+        /// <summary>
+        /// 录制线程
+        /// </summary>
+        private Thread operation;
+
+        /// <summary>
+        /// 锁对象
+        /// </summary>
+        private readonly object _locker = new Object();
+
+        /// <summary>
+        /// 是否启用录制
+        /// </summary>
+        private bool _isRecording = false;
 
         private void OnGUI()
         {
@@ -155,7 +134,7 @@ namespace Export
             GUILayout.Label("ffmpeg.exe存放位置:");
             GUILayout.BeginHorizontal();
             GUILayout.TextArea(FFMPEGEXEPATH);
-            if (GUILayout.Button("...",GUILayout.Width(30)))
+            if (GUILayout.Button("...", GUILayout.Width(30)))
             {
                 //Item.ChoiceFolder(ref FFMPEGEXEPATH, "选择ffmpeg.exe所在的位置");
                 if (string.IsNullOrEmpty(FFMPEGEXEPATH))
@@ -180,7 +159,7 @@ namespace Export
                 {
                     Debug.LogAssertion("录制位置未定位!");
                 }
-                else if (record2==null)
+                else if (record2 == null)
                 {
                     record2 = new Record2(Path, FFMPEGEXEPATH);
                     record2.Start();
@@ -189,14 +168,14 @@ namespace Export
                 else
                 {
                     record2.SetPATH(Path);
-                    var ffpath = string.IsNullOrWhiteSpace(record2.FFMPEGPATH)? FFMPEGEXEPATH: record2.FFMPEGPATH;
+                    var ffpath = string.IsNullOrWhiteSpace(record2.FFMPEGPATH) ? FFMPEGEXEPATH : record2.FFMPEGPATH;
                     record2.Start(ffpath);
                     Debug.Log("开始录制");
                 }
             }
             if (GUILayout.Button("结束录制"))
             {
-                if (record2!=null)
+                if (record2 != null)
                 {
                     record2.Stop();
                     record2 = null;
@@ -214,7 +193,64 @@ namespace Export
 #endif
             #endregion
 
+            #region 用DirectX录制
+            // 判断是否支持DirectX录制
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("开始录制"))
+            {
+                device?.Dispose();
+                device = new Device(DriverType.Hardware, DeviceCreationFlags.BgraSupport);
+                _isRecording = true;
+            }
+            if (GUILayout.Button("结束录制"))
+            {
+                _isRecording = false;
+            }
+            GUILayout.EndHorizontal();
+            #endregion
+
             GUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 初始化录制
+        /// </summary>
+        private void Start()
+        {
+            lock (_locker)
+            {
+                operation?.Abort();
+                operation = new Thread(() =>
+                {
+                    using (var dxgiSC = new DXGIScreenCapture(Screen.PrimaryScreen))
+                    {
+                        while (_isRecording)
+                        {
+                            // 执行操作
+                            using (var bitmap = dxgiSC.Capture())
+                            {
+                                if (bitmap == null)
+                                {
+                                    continue;
+                                }
+                                // 处理捕获的位图
+
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        /// <summary>
+        /// 停止录制
+        /// </summary>
+        private void Stop()
+        {
+            lock (_locker)
+            {
+
+            }
         }
     }
 }

@@ -77,9 +77,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y /R "$(TargetDir)Core.dll" "$(SolutionDir)dict\" || exit /b /1
-xcopy /Y /R "$(TargetDir)Runtime.dll" "$(SolutionDir)dict\" || exit /b /1
-xcopy /Y /R "$(TargetDir)Core.pdb" "$(SolutionDir)dict\" || exit /b /1
+    <PostBuildEvent>xcopy /Y /R "$(TargetDir)Runtime.dll" "$(SolutionDir)dict\" || exit /b /1
 xcopy /Y /R "$(TargetDir)Runtime.pdb" "$(SolutionDir)dict\" || exit /b /1
 ::explorer /select,"$(SolutionDir)dict\Runtime.dll" || exit /b /1</PostBuildEvent>
   </PropertyGroup>

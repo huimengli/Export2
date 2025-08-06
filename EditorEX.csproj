@@ -9,11 +9,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Export</RootNamespace>
     <AssemblyName>EditorEX</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +40,15 @@
     </Reference>
     <Reference Include="Runtime">
       <HintPath>Runtime\bin\Debug\Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>packages\SharpDX.4.2.0\lib\net45\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>packages\SharpDX.Direct3D11.4.2.0\lib\net45\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>packages\SharpDX.DXGI.4.2.0\lib\net45\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -81,6 +91,8 @@
     <Content Include="Script\Record.cs" />
     <Compile Include="Script\Record2.cs" />
     <Compile Include="Script\RecordWindow.cs" />
+    <Compile Include="SharpDX\DXGIScreenCapture.cs" />
+    <Compile Include="SharpDX\ImageDiffer.cs" />
     <Compile Include="UnityFBXExporter\ExporterMenu.cs" />
     <Compile Include="UnityFBXExporter\FBXExporter.cs" />
     <Compile Include="UnityFBXExporter\FBXUnityMaterialGetter.cs" />
@@ -89,17 +101,16 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>del /S /Q "$(SolutionDir)dict\*.dll" || exit /b /1
 del /S /Q "$(SolutionDir)dict\*.pdb" || exit /b /1
-xcopy /Y /R "$(TargetDir)Core.dll" "$(SolutionDir)dict\" || exit /b /1
-xcopy /Y /R "$(TargetDir)Runtime.dll" "$(SolutionDir)dict\" || exit /b /1
 xcopy /Y /R "$(TargetDir)EditorEX.dll" "$(SolutionDir)dict\" || exit /b /1
-xcopy /Y /R "$(TargetDir)Core.pdb" "$(SolutionDir)dict\" || exit /b /1
-xcopy /Y /R "$(TargetDir)Runtime.pdb" "$(SolutionDir)dict\" || exit /b /1
 xcopy /Y /R "$(TargetDir)EditorEX.pdb" "$(SolutionDir)dict\" || exit /b /1
-::explorer /select,"$(SolutionDir)dict\EditorEX.dll" || exit /b /1
+explorer /select,"$(SolutionDir)dict\EditorEX.dll" || exit /b /1
 
 </PostBuildEvent>
   </PropertyGroup>

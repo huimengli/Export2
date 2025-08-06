@@ -1,5 +1,4 @@
-﻿using Export.Attribute;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace Export.Attribute
@@ -9,34 +8,45 @@ namespace Export.Attribute
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            var attribute = (ReadOnlyTextAreaAttribute)this.attribute;
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                EditorGUI.HelpBox(position, "ReadOnlyTextArea只能用于string类型字段", MessageType.Error);
+                return;
+            }
 
-            // 计算文本区域的高度
-            float textHeight = EditorStyles.textArea.CalcHeight(new GUIContent(property.stringValue), position.width);
-
-            // 计算标签的高度
+            // 计算高度
             float labelHeight = EditorGUIUtility.singleLineHeight;
+            float textHeight = EditorStyles.textArea.CalcHeight(
+                new GUIContent(property.stringValue),
+                position.width);
 
-            // 合并高度
-            float totalHeight = textHeight + labelHeight;
-
-            EditorGUI.BeginDisabledGroup(true);  // 禁用 GUI，使文本区域为只读
-
-            // 绘制变量名
-            EditorGUI.LabelField(new Rect(position.x, position.y, position.width, labelHeight), label);
+            // 绘制标签
+            EditorGUI.LabelField(
+                new Rect(position.x, position.y, position.width, labelHeight),
+                label);
 
             // 绘制只读文本区域
-            EditorGUI.TextArea(new Rect(position.x, position.y + labelHeight, position.width, textHeight), property.stringValue, EditorStyles.textArea);
-
-            EditorGUI.EndDisabledGroup();  // 重新启用 GUI
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUI.TextArea(
+                new Rect(
+                    position.x,
+                    position.y + labelHeight + 2f,  // 添加2像素间距
+                    position.width,
+                    textHeight),
+                property.stringValue,
+                EditorStyles.textArea);
+            EditorGUI.EndDisabledGroup();
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            var attribute = (ReadOnlyTextAreaAttribute)this.attribute;
-            float textHeight = EditorStyles.textArea.CalcHeight(new GUIContent(property.stringValue), EditorGUIUtility.currentViewWidth);
-            float labelHeight = EditorGUIUtility.singleLineHeight;
-            return textHeight + labelHeight;
+            if (property.propertyType != SerializedPropertyType.String)
+                return EditorGUIUtility.singleLineHeight;
+
+            float textHeight = EditorStyles.textArea.CalcHeight(
+                new GUIContent(property.stringValue),
+                EditorGUIUtility.currentViewWidth - EditorGUIUtility.labelWidth);
+            return EditorGUIUtility.singleLineHeight + textHeight + 4f; // 总间距4像素
         }
     }
 }

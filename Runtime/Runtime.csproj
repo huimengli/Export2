@@ -48,8 +48,14 @@
     <Reference Include="UnityEngine.InputLegacyModule">
       <HintPath>..\lib\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.Physics2DModule">
+      <HintPath>..\lib\UnityEngine.Physics2DModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\lib\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>..\lib\UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -62,6 +68,7 @@
     <Compile Include="Enums\ControlEnum.cs" />
     <Compile Include="Interface\IPlayerMove.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Script\ButtonEX.cs" />
     <Compile Include="Script\Message.cs" />
     <Compile Include="Script\PlayerKeybordMove.cs" />
     <Compile Include="Script\PlayerUIMove.cs" />

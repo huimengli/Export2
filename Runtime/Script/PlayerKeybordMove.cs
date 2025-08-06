@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Export.Attribute;
+using Export.Enums;
 using Export.Interface;
 using Export.Tools;
 using UnityEngine;
@@ -20,6 +21,12 @@ namespace Export.Script
         /// </summary>
         [ReadOnly]
         public string uuid;
+
+        /// <summary>
+        /// 控制器类型
+        /// </summary>
+        [ReadOnly]
+        public ControlEnum control = ControlEnum.Keyboard;
 
         /// <summary>
         /// 静步移动速度
@@ -39,6 +46,12 @@ namespace Export.Script
         [Range(5f,20f)]
         public float runSpeed = 10.0f; // 冲刺速度
 
+        /// <summary>
+        /// 当前移动速度
+        /// </summary>
+        [ReadOnly]
+        public float currentMoveSpeed = 0;
+
         public KeyCode moveForwardKey = KeyCode.W; // 前进键
         public KeyCode moveBackwardKey = KeyCode.S; // 后退键
         public KeyCode moveLeftKey = KeyCode.A; // 左移键
@@ -54,12 +67,6 @@ namespace Export.Script
         /// </summary>
         [ReadOnly]
         public List<KeyCode> moveKeys = new List<KeyCode>();
-
-        /// <summary>
-        /// 当前移动速度
-        /// </summary>
-        [ReadOnly]
-        public float currentMoveSpeed = 0;
 
         public Vector3 Position
         {

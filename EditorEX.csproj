@@ -106,9 +106,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>del /S /Q "$(SolutionDir)dict\*.dll" || exit /b /1
-del /S /Q "$(SolutionDir)dict\*.pdb" || exit /b /1
-xcopy /Y /R "$(TargetDir)EditorEX.dll" "$(SolutionDir)dict\" || exit /b /1
+    <PostBuildEvent>xcopy /Y /R "$(TargetDir)EditorEX.dll" "$(SolutionDir)dict\" || exit /b /1
 xcopy /Y /R "$(TargetDir)EditorEX.pdb" "$(SolutionDir)dict\" || exit /b /1
 explorer /select,"$(SolutionDir)dict\EditorEX.dll" || exit /b /1
 

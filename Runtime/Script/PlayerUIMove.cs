@@ -139,6 +139,13 @@ internal class PlayerUIMove : MonoBehaviour, IPlayerMove, IDragHandler, IEndDrag
     /// </summary>
     private bool isRunButtonPressed = false; // 新增字段
 
+    /// <summary>
+    /// 旋转平滑度
+    /// </summary>
+    [Header("旋转设置")]
+    [Range(0.1f, 20f)]
+    public float rotationSmoothness = 5.0f;
+
     public Vector3 Position
     {
         get { return transform.position; }
@@ -295,6 +302,23 @@ internal class PlayerUIMove : MonoBehaviour, IPlayerMove, IDragHandler, IEndDrag
     }
 
     /// <summary>
+    /// 根据移动方向更新角色朝向
+    /// </summary>
+    private void UpdateRotation(Vector3 moveDirection)
+    {
+        // 计算目标朝向角度（俯视角）
+        float targetAngle = Mathf.Atan2(moveDirection.x, moveDirection.z) * Mathf.Rad2Deg;
+
+        // 平滑旋转
+        Quaternion targetRotation = Quaternion.Euler(0, targetAngle, 0);
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRotation,
+            rotationSmoothness * Time.deltaTime
+        );
+    }
+
+    /// <summary>
     /// 处理拖拽开始事件
     /// </summary>
     public void OnPointerDown(PointerEventData eventData)
@@ -367,10 +391,15 @@ internal class PlayerUIMove : MonoBehaviour, IPlayerMove, IDragHandler, IEndDrag
 
         // 修改人物位置
         var dir = Move();
-        if (dir.magnitude > 0.1f)
+        if (dir.magnitude > 0.01f)
         {
-            player.velocity = dir;
+            UpdateRotation(dir); // 顺便更新旋转
         }
+        transform.position += dir;
+        //if (dir.magnitude > 0.1f)
+        //{
+        //    player.velocity = dir; // 移动刚体
+        //}
     }
 
     /// <summary>

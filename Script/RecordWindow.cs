@@ -1,24 +1,15 @@
 ﻿#define Record
 #define Record2
 
+using Export.Tools;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using UnityEditor;
 using UnityEngine;
-using Export.Tools;
-using System.Threading;
-using Export.SharpDX;
-using SharpDX.Direct3D;
-using SharpDX.Direct3D11;
 
-using Device = SharpDX.Direct3D11.Device;
-using Resource = SharpDX.DXGI.Resource;
-using MapFlags = SharpDX.Direct3D11.MapFlags;
-using ResultCode = SharpDX.DXGI.ResultCode;
 using Object = System.Object;
-using Screen = System.Windows.Forms.Screen;
 
 namespace Export
 {
@@ -27,7 +18,7 @@ namespace Export
         /// <summary>
         /// 录制位置
         /// </summary>
-        private static string Path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\output.mkv";
+        private static string Path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\output.mp4";
 
         /// <summary>
         /// 页面
@@ -61,11 +52,6 @@ namespace Export
         }
 
         /// <summary>
-        /// 设备
-        /// </summary>
-        private Device device;
-
-        /// <summary>
         /// 录制线程
         /// </summary>
         private Thread operation;
@@ -74,6 +60,11 @@ namespace Export
         /// 锁对象
         /// </summary>
         private readonly object _locker = new Object();
+
+        /// <summary>
+        /// 写入对象
+        /// </summary>
+        private VideoWriter writer;
 
         /// <summary>
         /// 是否启用录制
@@ -92,7 +83,7 @@ namespace Export
             if (GUILayout.Button("...", GUILayout.Width(30)))
             {
                 Item.ChoiceFolder(ref Path, "选择保存文件夹");
-                Path = Path += "\\output.mkv";
+                Path = Path += "\\output.mp4";
             }
             GUILayout.EndHorizontal();
 
@@ -198,13 +189,11 @@ namespace Export
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("开始录制"))
             {
-                device?.Dispose();
-                device = new Device(DriverType.Hardware, DeviceCreationFlags.BgraSupport);
-                _isRecording = true;
+                Start();
             }
             if (GUILayout.Button("结束录制"))
             {
-                _isRecording = false;
+                Stop();
             }
             GUILayout.EndHorizontal();
             #endregion
@@ -217,28 +206,49 @@ namespace Export
         /// </summary>
         private void Start()
         {
+            _isRecording = true;
+            Debug.Log("开始录制");
+
             lock (_locker)
             {
                 operation?.Abort();
                 operation = new Thread(() =>
                 {
-                    using (var dxgiSC = new DXGIScreenCapture(Screen.PrimaryScreen))
+                    var desktopSize = new Size();
+                    while (true)
                     {
-                        while (_isRecording)
+                        var desktop = ImageProcessing.GetScreen();
+                        if (desktop != null)
                         {
-                            // 执行操作
-                            using (var bitmap = dxgiSC.Capture())
-                            {
-                                if (bitmap == null)
-                                {
-                                    continue;
-                                }
-                                // 处理捕获的位图
-
-                            }
+                            desktopSize.Width = desktop.Width;
+                            desktopSize.Height = desktop.Height;
+                            desktop?.Dispose();
+                            desktop = null;
+                            break;
                         }
                     }
+                    writer?.Dispose();
+                    writer = new VideoWriter(Path, FourCC.H264, 10, desktopSize);
+                    while (_isRecording)
+                    {
+                        // 执行操作
+                        using (var bitmap = ImageProcessing.GetScreen())
+                        {
+                            if (bitmap == null)
+                            {
+                                continue;
+                            }
+                            // 处理捕获的位图
+                            Mat mat = BitmapConverter.ToMat(bitmap);
+                            writer.Write(mat);
+
+                            // 等待
+                            Thread.Sleep(100);
+                        }
+                    }
+                    writer.Release();
                 });
+                operation.Start();
             }
         }
 
@@ -249,7 +259,8 @@ namespace Export
         {
             lock (_locker)
             {
-
+                _isRecording = false;
+                Debug.Log("结束录制");
             }
         }
     }

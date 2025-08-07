@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace Export.SharpDX
+namespace Export.Tools
 {
     /// <summary>
     /// 图片差异计算类

@@ -108,6 +108,19 @@ namespace Export.Script
             set { currentMoveSpeed = value; }
         }
 
+        public Rigidbody player
+        {
+            get
+            {
+                var ret = gameObject.GetComponent<Rigidbody>();
+                if (ret == null)
+                {
+                    ret = gameObject.AddComponent<Rigidbody>();
+                }
+                return ret;
+            }
+        }
+
         private void Awake()
         {
             uuid = Item.NewUUID();

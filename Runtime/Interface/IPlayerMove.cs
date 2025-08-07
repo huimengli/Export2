@@ -48,6 +48,11 @@ namespace Export.Interface
         Quaternion Rotation { get; set; }
 
         /// <summary>
+        /// 玩家刚体
+        /// </summary>
+        Rigidbody player { get; }
+
+        /// <summary>
         /// 玩家移动方法
         /// </summary>
         /// <returns></returns>

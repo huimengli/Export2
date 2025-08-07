@@ -180,6 +180,19 @@ internal class PlayerUIMove : MonoBehaviour, IPlayerMove, IDragHandler, IEndDrag
         set { currentMoveSpeed = value; }
     }
 
+    public Rigidbody player
+    {
+        get
+        {
+            var ret = gameObject.GetComponent<Rigidbody>();
+            if (ret == null)
+            {
+                ret = gameObject.AddComponent<Rigidbody>();
+            }
+            return ret;
+        }
+    }
+
     private void Awake()
     {
         uuid = Item.NewUUID(); // 生成唯一标识符
@@ -353,7 +366,11 @@ internal class PlayerUIMove : MonoBehaviour, IPlayerMove, IDragHandler, IEndDrag
         }
 
         // 修改人物位置
-        transform.position += Move();
+        var dir = Move();
+        if (dir.magnitude > 0.1f)
+        {
+            player.velocity = dir;
+        }
     }
 
     /// <summary>

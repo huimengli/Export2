@@ -146,6 +146,20 @@ internal class PlayerUIMove : MonoBehaviour, IPlayerMove, IDragHandler, IEndDrag
     [Range(0.1f, 20f)]
     public float rotationSmoothness = 5.0f;
 
+    /// <summary>
+    /// 地面检测距离（从玩家底部向下检测的距离）
+    /// </summary>
+    [Header("物理设置")]
+    public float groundCheckDistance = 0.2f;
+    /// <summary>
+    /// 地面层级掩码（用于射线检测识别哪些物体是地面）
+    /// </summary>
+    public LayerMask groundLayer;
+    /// <summary>
+    /// 是否在地面上（检测玩家当前是否接触地面）
+    /// </summary>
+    private bool isGrounded;
+
     public Vector3 Position
     {
         get { return transform.position; }
@@ -272,6 +286,10 @@ internal class PlayerUIMove : MonoBehaviour, IPlayerMove, IDragHandler, IEndDrag
         pointerUpEntry.eventID = EventTriggerType.PointerUp;
         pointerUpEntry.callback.AddListener((data) => { OnRunButtonReleased(); });
         runEventTrigger.triggers.Add(pointerUpEntry);
+
+        // 添加刚体物理设置
+        player.freezeRotation = true; // 防止物理旋转导致抖动
+        player.collisionDetectionMode = CollisionDetectionMode.Continuous; // 避免穿墙
     }
 
     /// <summary>
@@ -389,17 +407,58 @@ internal class PlayerUIMove : MonoBehaviour, IPlayerMove, IDragHandler, IEndDrag
             HandleTouchInput();
         }
 
-        // 修改人物位置
-        var dir = Move();
-        if (dir.magnitude > 0.01f)
+        // 移除这里的移动旋转变更
+    }
+
+    private void FixedUpdate() // 物理更新
+    {
+        CheckGrounded();
+        HandleMovement();
+    }
+
+    private void CheckGrounded()
+    {
+        // 射线检测是否在地面
+        isGrounded = Physics.Raycast(
+            transform.position + Vector3.up * 0.1f,
+            Vector3.down,
+            groundCheckDistance + 0.1f,
+            groundLayer
+        );
+    }
+
+    private void HandleMovement()
+    {
+        if (!isDragging || buttonImagePosition.magnitude < 0.01f)
         {
-            UpdateRotation(dir); // 顺便更新旋转
+            // 无输入时保持垂直速度（重力），水平速度归零
+            player.velocity = new Vector3(0, player.velocity.y, 0);
+            return;
         }
-        transform.position += dir;
-        //if (dir.magnitude > 0.1f)
-        //{
-        //    player.velocity = dir; // 移动刚体
-        //}
+
+        // 计算移动方向（XZ平面）
+        Vector3 moveDirection = new Vector3(
+            buttonImagePosition.x,
+            0,
+            buttonImagePosition.y
+        ).normalized;
+
+        // 更新跑步状态
+        UpdateRunningState();
+
+        // 应用速度（保留Y轴重力）
+        Vector3 targetVelocity = moveDirection * currentMoveSpeed;
+        targetVelocity.y = player.velocity.y; // 保持垂直速度
+
+        // 平滑过渡速度
+        player.velocity = Vector3.Lerp(
+            player.velocity,
+            targetVelocity,
+            rotationSmoothness * Time.fixedDeltaTime
+        );
+
+        // 更新旋转
+        UpdateRotation(moveDirection);
     }
 
     /// <summary>

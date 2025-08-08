@@ -261,6 +261,9 @@ namespace Export
             {
                 _isRecording = false;
                 Debug.Log("结束录制");
+                
+                // 打开文件
+                Item.OpenFile(Path);
             }
         }
     }

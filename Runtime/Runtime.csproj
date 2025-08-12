@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attribute\ConditionalHideAttribute.cs" />
+    <Compile Include="Attribute\ConditionalShowAttribute.cs" />
     <Compile Include="Attribute\ReadOnlyAttribute.cs" />
     <Compile Include="Attribute\ReadOnlyTextAreaAttribute.cs" />
     <Compile Include="BehaviourEX\Dispatcher.cs" />

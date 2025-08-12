@@ -11,8 +11,8 @@ namespace Export.Attribute
     /// <summary>
     /// 自定义属性绘制器，用于处理ConditionalHideAttribute特性的字段绘制
     /// </summary>
-    [CustomPropertyDrawer(typeof(ConditionalHideAttribute))]
-    public class ConditionalHideDrawer : PropertyDrawer
+    [CustomPropertyDrawer(typeof(ConditionalShowAttribute))]
+    public class ConditionalShowDrawer : PropertyDrawer
     {
         /// <summary>
         /// 重写OnGUI方法，处理字段在Unity编辑器中的绘制逻辑
@@ -23,15 +23,15 @@ namespace Export.Attribute
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             // 获取当前字段上的ConditionalHideAttribute特性
-            ConditionalHideAttribute condHAtt = (ConditionalHideAttribute)attribute;
+            ConditionalShowAttribute condHAtt = (ConditionalShowAttribute)attribute;
             // 查找条件源字段
             SerializedProperty sourceProperty = property.serializedObject.FindProperty(condHAtt.ConditionalSourceField);
 
             // 检查条件是否满足显示要求
             bool show = ShouldShow(sourceProperty, condHAtt.ShowValues);
 
-            // 如果不满足条件，则正常绘制字段
-            if (!show)
+            // 如果满足条件，则正常绘制字段
+            if (show)
             {
                 EditorGUI.PropertyField(position, property, label, true);
             }
@@ -46,7 +46,7 @@ namespace Export.Attribute
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             // 获取当前字段上的ConditionalHideAttribute特性
-            ConditionalHideAttribute condHAtt = (ConditionalHideAttribute)attribute;
+            ConditionalShowAttribute condHAtt = (ConditionalShowAttribute)attribute;
             // 查找条件源字段
             SerializedProperty sourceProperty = property.serializedObject.FindProperty(condHAtt.ConditionalSourceField);
 

@@ -76,7 +76,7 @@ namespace Export.Attribute
             }
 
             // 获取当前枚举值索引
-            int currentValue = sourceProperty.enumValueIndex;
+            int currentValue = sourceProperty.intValue;
             // 检查当前值是否在允许显示的数值列表中
             foreach (int value in showValues)
             {
@@ -87,5 +87,4 @@ namespace Export.Attribute
             return false;
         }
     }
-
 }

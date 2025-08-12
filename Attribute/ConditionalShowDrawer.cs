@@ -12,7 +12,7 @@ namespace Export.Attribute
     /// 自定义属性绘制器，用于处理ConditionalHideAttribute特性的字段绘制
     /// </summary>
     [CustomPropertyDrawer(typeof(ConditionalShowAttribute))]
-    public class ConditionalShowDrawer : PropertyDrawer
+    public class ConditionalShowDrawer : PropertyDrawerEX
     {
         /// <summary>
         /// 重写OnGUI方法，处理字段在Unity编辑器中的绘制逻辑
@@ -33,7 +33,21 @@ namespace Export.Attribute
             // 如果满足条件，则正常绘制字段
             if (show)
             {
-                EditorGUI.PropertyField(position, property, label, true);
+                var nextDrawer = GetNextDrawer(property, label);
+                if (nextDrawer != null)
+                {
+                    // 使用下一个绘制器绘制
+                    nextDrawer.OnGUI(position, property, label);
+                }
+                else
+                {
+                    // 没有其他绘制器，使用默认绘制
+                    EditorGUI.PropertyField(position, property, label, true);
+                }
+            }
+            else
+            {
+                return;
             }
         }
 
@@ -56,7 +70,13 @@ namespace Export.Attribute
                 return -EditorGUIUtility.standardVerticalSpacing; // 完全移除空间
             }
 
-            // 条件满足时返回正常高度
+            // 获取下一个绘制器
+            var nextDrawer = GetNextDrawer(property, label);
+            if (nextDrawer != null)
+            {
+                return nextDrawer.GetPropertyHeight(property, label);
+            }
+            // 否则返回默认高度
             return EditorGUI.GetPropertyHeight(property, label);
         }
 

@@ -22,9 +22,9 @@ namespace Export.Attribute
     ///         Staff
     ///     }
     ///     public WeaponType currentWeapon;
-    ///     [ConditionalHide("currentWeapon", (int)WeaponType.Bow)]
+    ///     [ConditionalShow("currentWeapon", (int)WeaponType.Bow)]
     ///     public int arrowCount;
-    ///     [ConditionalHide("currentWeapon", (int)WeaponType.Staff)]
+    ///     [ConditionalShow("currentWeapon", (int)WeaponType.Staff)]
     ///     public float magicPower;
     /// }
     /// </example>

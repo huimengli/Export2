@@ -97,6 +97,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attribute\ConditionalHideDrawer.cs" />
     <Compile Include="Attribute\ReadOnlyEditor.cs" />
     <Compile Include="Attribute\ReadOnlyTextAreaDrawer.cs" />
     <Compile Include="Editor\InspectorEX.cs" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Export.Tools;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -8,6 +9,8 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
+using Random = System.Random;
+
 namespace Export.Attribute
 {
     /// <summary>
@@ -15,15 +18,28 @@ namespace Export.Attribute
     /// </summary>
     public abstract class PropertyDrawerEX : PropertyDrawer
     {
-        private static readonly Dictionary<Type, PropertyDrawer> _drawerCache =
-            new Dictionary<Type, PropertyDrawer>();
+        /// <summary>
+        /// UUID
+        /// </summary>
+        private readonly string uuid;
+        private static readonly Random r;
+        private static readonly Dictionary<PropertyAttribute, PropertyDrawer> _drawerCache =
+            new Dictionary<PropertyAttribute, PropertyDrawer>();
         private static readonly Dictionary<string, FieldInfo> _fieldInfoCache =
             new Dictionary<string, FieldInfo>();
         private static readonly Dictionary<Type, Type> _drawerTypeCache =
             new Dictionary<Type, Type>();
 
+        public PropertyDrawerEX()
+        {
+            uuid = Item.NewUUID(r.NextDouble().ToString());
+        }
+
         static PropertyDrawerEX()
         {
+            // 生成随机数生成器
+            r = new Random();
+
             // 预加载常用drawer类型
             var drawerTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(a => a.GetTypes())
@@ -67,15 +83,20 @@ namespace Export.Attribute
                 .OrderBy(attr => attr.GetType().Name) // 按类型名排序确保顺序一致
                 .ToList();
 
+            //var message = new StringBuilder();
+            //message.Append("GetNextDrawer : " + attributes.Count + " : " + fieldInfo.Name + " : " + fieldInfo.DeclaringType.FullName + "\n");
+            //message.Append("Attributes: " + string.Join(", ", attributes.Select(attr => attr.GetType().Name)) + "\n");
+            //Debug.Log(message.ToString());
+
             // 尝试找到并返回第一个有效的绘制器
             foreach (var attr in attributes)
             {
-                if (!_drawerCache.TryGetValue(attr.GetType(), out var drawer))
+                if (!_drawerCache.TryGetValue(attr, out var drawer))
                 {
                     drawer = CreateDrawerInstance(attr, fieldInfo);
                     if (drawer != null)
                     {
-                        _drawerCache[attr.GetType()] = drawer;
+                        _drawerCache[attr] = drawer;
                         return drawer; // 找到第一个有效绘制器即返回
                     }
                 }

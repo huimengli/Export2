@@ -49,7 +49,7 @@ namespace Export.Attribute
             var editorAssembly = typeof(UnityEditor.Editor).Assembly;
             var exportAssembly = Assembly.GetExecutingAssembly();
             RegisterBuiltinDrawer(editorAssembly, "UnityEditor.RangeDrawer", typeof(RangeAttribute));
-            RegisterBuiltinDrawer(exportAssembly, "Export.ReadOnlyEditor", typeof(ReadOnlyAttribute));
+            RegisterBuiltinDrawer(exportAssembly, "Export.Attribute.ReadOnlyAttributeDrawer", typeof(ReadOnlyAttribute));
             //RegisterBuiltinDrawer(editorAssembly, "UnityEditor.MinMaxDrawer", typeof(MinMaxAttribute));
 
             foreach (var type in drawerTypes)

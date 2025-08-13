@@ -29,6 +29,13 @@ namespace Export.Attribute
                 .SelectMany(a => a.GetTypes())
                 .Where(t => typeof(PropertyDrawer).IsAssignableFrom(t));
 
+            // ======== 新增：注册Unity内置绘制器 ========
+            var editorAssembly = typeof(UnityEditor.Editor).Assembly;
+            var exportAssembly = Assembly.GetExecutingAssembly();
+            RegisterBuiltinDrawer(editorAssembly, "UnityEditor.RangeDrawer", typeof(RangeAttribute));
+            RegisterBuiltinDrawer(exportAssembly, "Export.ReadOnlyEditor", typeof(ReadOnlyAttribute));
+            //RegisterBuiltinDrawer(editorAssembly, "UnityEditor.MinMaxDrawer", typeof(MinMaxAttribute));
+
             foreach (var type in drawerTypes)
             {
                 var attrType = type.GetCustomAttribute<CustomPropertyDrawer>()?.GetType();
@@ -39,22 +46,43 @@ namespace Export.Attribute
             }
         }
 
+        private static void RegisterBuiltinDrawer(Assembly editorAssembly, string drawerClassName, Type attributeType)
+        {
+            var drawerType = editorAssembly.GetType(drawerClassName);
+            if (drawerType != null && !_drawerTypeCache.ContainsKey(attributeType))
+            {
+                _drawerTypeCache[attributeType] = drawerType;
+            }
+        }
+
         protected PropertyDrawer GetNextDrawer(SerializedProperty property, GUIContent label)
         {
             var fieldInfo = GetCachedFieldInfo(property);
             if (fieldInfo == null) return null;
 
-            var attributes = fieldInfo.GetCustomAttributes(false);
+            // 获取所有 PropertyAttribute 并按声明顺序排序
+            var attributes = fieldInfo.GetCustomAttributes(typeof(PropertyAttribute), false)
+                .Cast<PropertyAttribute>()
+                .Where(attr => attr != attribute)  // 排除自身属性
+                .OrderBy(attr => attr.GetType().Name) // 按类型名排序确保顺序一致
+                .ToList();
+
+            // 尝试找到并返回第一个有效的绘制器
             foreach (var attr in attributes)
             {
-                if (attr == attribute) continue;
-
                 if (!_drawerCache.TryGetValue(attr.GetType(), out var drawer))
                 {
                     drawer = CreateDrawerInstance(attr, fieldInfo);
-                    if (drawer != null) _drawerCache[attr.GetType()] = drawer;
+                    if (drawer != null)
+                    {
+                        _drawerCache[attr.GetType()] = drawer;
+                        return drawer; // 找到第一个有效绘制器即返回
+                    }
                 }
-                return drawer;
+                else if (drawer != null)
+                {
+                    return drawer;
+                }
             }
             return null;
         }
@@ -87,6 +115,16 @@ namespace Export.Attribute
 
         private FieldInfo GetFieldInfoRecursive(Type type, string path)
         {
+            // ======== 修复：处理泛型列表和数组 ========
+            if (type.IsGenericType && type.GetInterface("IList") != null)
+            {
+                type = type.GetGenericArguments()[0];
+            }
+            else if (type.IsArray)
+            {
+                type = type.GetElementType();
+            }
+
             FieldInfo field = null;
             string[] parts = path.Split('.');
 
@@ -115,30 +153,45 @@ namespace Export.Attribute
             return field;
         }
 
-        private PropertyDrawer CreateDrawerInstance(object attr, FieldInfo fieldInfo)
+        private PropertyDrawer CreateDrawerInstance(PropertyAttribute attr, FieldInfo fieldInfo)
         {
             if (!_drawerTypeCache.TryGetValue(attr.GetType(), out var drawerType))
                 return null;
 
-            var drawer = (PropertyDrawer)Activator.CreateInstance(drawerType);
+            try
+            {
+                var drawer = (PropertyDrawer)Activator.CreateInstance(drawerType);
+                PropertyDrawerHelper.SetFieldInfo(drawer, fieldInfo);
+                PropertyDrawerHelper.SetAttribute(drawer, attr);
+                return drawer;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to create drawer for {attr.GetType()}: {ex.Message}");
+                return null;
+            }
+        }
 
-            // 使用预编译的委托设置字段
-            PropertyDrawerHelper.SetFieldInfo(drawer, fieldInfo);
-            PropertyDrawerHelper.SetAttribute(drawer, attr);
-
-            return drawer;
+        /// <summary>
+        /// Unity编辑器脚本重载时清理缓存
+        /// </summary>
+        [UnityEditor.Callbacks.DidReloadScripts]
+        private static void OnScriptsReloaded()
+        {
+            _drawerCache.Clear();
+            _fieldInfoCache.Clear();
         }
     }
 
     public static class PropertyDrawerHelper
     {
         private static readonly Action<PropertyDrawer, FieldInfo> _setFieldInfo;
-        private static readonly Action<PropertyDrawer, object> _setAttribute;
+        private static readonly Action<PropertyDrawer, PropertyAttribute> _setAttribute;
 
         static PropertyDrawerHelper()
         {
             _setFieldInfo = CreateFieldSetter<FieldInfo>("m_FieldInfo");
-            _setAttribute = CreateFieldSetter<object>("m_Attribute");
+            _setAttribute = CreateFieldSetter<PropertyAttribute>("m_Attribute");
         }
 
         private static Action<PropertyDrawer, T> CreateFieldSetter<T>(string fieldName)
@@ -154,6 +207,16 @@ namespace Export.Attribute
             => _setFieldInfo(drawer, fieldInfo);
 
         public static void SetAttribute(PropertyDrawer drawer, object attribute)
-            => _setAttribute(drawer, attribute);
+        {
+            // 添加安全类型转换
+            if (attribute is PropertyAttribute propAttr)
+            {
+                _setAttribute(drawer, propAttr);
+            }
+            else
+            {
+                Debug.LogError($"Invalid attribute type: {attribute?.GetType()}, expected PropertyAttribute");
+            }
+        }
     }
 }

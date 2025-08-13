@@ -25,7 +25,6 @@ namespace Export.Attribute
 
             // 获取下一个绘制器
             var nextDrawer = GetNextDrawer(property, label);
-
             if (nextDrawer != null)
             {
                 // 使用下一个绘制器绘制
@@ -61,18 +60,25 @@ namespace Export.Attribute
 
         private bool ShouldHide(SerializedProperty sourceProperty, int[] hideValues)
         {
-            if (sourceProperty == null || sourceProperty.propertyType != SerializedPropertyType.Enum)
+            // ======== 增强类型安全 ========
+            if (sourceProperty == null)
             {
-                Debug.LogWarning("ConditionalHide requires an Enum field");
-                return false; // 默认不隐藏
+                Debug.LogWarning("ConditionalSourceField not found");
+                return false;
             }
 
-            int currentValue = sourceProperty.intValue;
-            foreach (int value in hideValues)
+            // 支持枚举和整数类型
+            if (sourceProperty.propertyType == SerializedPropertyType.Enum)
             {
-                if (currentValue == value) return true;
+                int currentValue = sourceProperty.intValue;
+                return hideValues.Contains(currentValue);
+            }
+            else if (sourceProperty.propertyType == SerializedPropertyType.Integer)
+            {
+                return hideValues.Contains(sourceProperty.intValue);
             }
 
+            Debug.LogWarning($"Unsupported type: {sourceProperty.propertyType}");
             return false;
         }
     }

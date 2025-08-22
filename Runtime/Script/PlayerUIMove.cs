@@ -15,7 +15,7 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// 玩家触控移动类
 /// </summary>
-internal class PlayerUIMove : MonoBehaviour, IPlayerMove, IDragHandler, IEndDragHandler, IPointerDownHandler, IPointerUpHandler
+public class PlayerUIMove : MonoBehaviour, IPlayerMove, IDragHandler, IEndDragHandler, IPointerDownHandler, IPointerUpHandler
 {
     /// <summary>
     /// 部件唯一标识符

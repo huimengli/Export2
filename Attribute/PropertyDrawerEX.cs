@@ -54,10 +54,14 @@ namespace Export.Attribute
 
             foreach (var type in drawerTypes)
             {
-                var attrType = type.GetCustomAttribute<CustomPropertyDrawer>()?.GetType();
-                if (attrType != null)
+                var attrs = type.GetCustomAttributes<CustomPropertyDrawer>(false);
+                foreach (var attr in attrs)
                 {
-                    _drawerTypeCache[attrType] = type;
+                    var attrType = attr?.GetType();
+                    if (attrType != null && !_drawerTypeCache.ContainsKey(attrType))
+                    {
+                        _drawerTypeCache[attrType] = type;
+                    }
                 }
             }
         }

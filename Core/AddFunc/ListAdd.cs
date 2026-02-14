@@ -449,5 +449,16 @@ namespace Export.AddFunc
             list.RemoveAt(list.Count - 1);
             return item;
         }
+
+        /// <summary>
+        /// 操作当前列表
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static List<T> This<T>(this List<T> list,Func<List<T>, List<T>> func)
+        {
+            return func(list);
+        }
     }
 }

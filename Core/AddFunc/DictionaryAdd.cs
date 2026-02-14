@@ -103,5 +103,18 @@ namespace Export.AddFunc
                 dictionary.Add(key, value);
             }
         }
+
+        /// <summary>
+        /// 操作当前字典
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="dict"></param>
+        /// <param name="func"></param>
+        /// <returns></returns>
+        public static Dictionary<TKey, TValue> This<TKey,TValue>(this Dictionary<TKey,TValue> dict, Func<Dictionary<TKey,TValue>,Dictionary<TKey,TValue>> func)
+        {
+            return func(dict);
+        }
     }
 }

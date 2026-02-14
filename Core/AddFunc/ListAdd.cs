@@ -431,5 +431,23 @@ namespace Export.AddFunc
             }
             return ret;
         }
+
+        /// <summary>
+        /// 抛出并返回最后一个元素
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static T Pop<T>(this List<T> list)
+        {
+            if (list == null || list.Count == 0)
+            {
+                return default(T);
+            }
+
+            T item = list[list.Count - 1];
+            list.RemoveAt(list.Count - 1);
+            return item;
+        }
     }
 }

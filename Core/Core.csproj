@@ -43,6 +43,7 @@
     <Compile Include="Class\DictionaryEX.cs" />
     <Compile Include="AddFunc\DictionaryAdd.cs" />
     <Compile Include="AddFunc\ListAdd.cs" />
+    <Compile Include="Class\ListEX.cs" />
     <Compile Include="Form\InputBox.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -338,6 +338,14 @@ namespace TheLongDarkBuckupTools.Class
         }
 
         /// <summary>
+        /// 返回列表长度
+        /// </summary>
+        public int Length
+        {
+            get { return Count; }
+        }
+
+        /// <summary>
         /// 将可能为负的索引转换为正索引
         /// </summary>
         private int NormalizeIndex(int index, string paramName)
